@@ -2,8 +2,9 @@
 from telegram.ext import ContextTypes
 from agent.core import Agent
 from agent.memory import Memory
-from config import REDIS_URL
+import os
 
+REDIS_URL = os.getenv("REDIS_URL")
 memory = Memory(REDIS_URL)
 agent = Agent(memory)
 
