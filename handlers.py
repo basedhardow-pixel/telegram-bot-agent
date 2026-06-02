@@ -1,0 +1,20 @@
+﻿from telegram import Update
+from telegram.ext import ContextTypes
+from agent.core import Agent
+from agent.memory import Memory
+from config import REDIS_URL
+
+memory = Memory(REDIS_URL)
+agent = Agent(memory)
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привет! Я умный бот-агент. Задай любой вопрос!")
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    message = update.message.text
+    try:
+        response = await agent.process(user_id, message)
+        await update.message.reply_text(response)
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка: {str(e)}")
