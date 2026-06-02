@@ -5,7 +5,7 @@ from datetime import datetime
 
 class Tools:
     def __init__(self):
-        self.weather_api_key = None  # вставь ключ если есть
+        self.weather_api_key = None
 
     async def search_web(self, query: str) -> str:
         try:
@@ -40,20 +40,20 @@ class Tools:
 
     async def get_exchange_rate(self, currency: str = "USD") -> str:
         try:
-            url = "https://www.cbr-xml-daily.ru/daily_json.js"
+            url = "https://api.exchangerate-api.com/v4/latest/USD"
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     data = await resp.json()
-                    rate = data["Valute"].get(currency.upper(), {}).get("Value")
+                    rates = data.get("rates", {})
+                    rate = rates.get(currency.upper())
                     if rate:
-                        return f"Курс {currency.upper()}: {rate} ₽"
+                        return f"Курс {currency.upper()}: {rate} RUB (примерно)"
                     return "Валюта не найдена."
-        except:
-            return "Ошибка курса валют."
+        except Exception as e:
+            return f"Ошибка курса: {str(e)}"
 
     async def calculate(self, expression: str) -> str:
         try:
-            # безопасный калькулятор (только цифры и операции)
             allowed = set("0123456789+-*/() .")
             if all(c in allowed for c in expression):
                 result = eval(expression)
