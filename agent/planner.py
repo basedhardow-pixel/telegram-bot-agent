@@ -16,7 +16,7 @@ class Planner:
         response = await self.client.chat.completions.create(
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=500,
-            temperature=0.7
+            max_tokens=150,
+            temperature=0.5
         )
         return response.choices[0].message.content
