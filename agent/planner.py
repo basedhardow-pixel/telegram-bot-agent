@@ -13,20 +13,29 @@ class Planner:
         self.model = LLM_MODEL
     
     async def think(self, prompt: str) -> str:
-        try:
-            response = await self.client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=200,
-                temperature=0.7
-            )
-            result = response.choices[0].message.content
-            if not result or result.strip() == "":
-                return "Извините, не удалось сформировать ответ."
-            return result
-        except Exception as e:
-            print(f"OpenRouter error: {e}")
-            return f"Ошибка API: {str(e)}"
+        models_to_try = [
+            self.model,
+            "openrouter/free",
+            "microsoft/phi-3-mini-128k-instruct:free"
+        ]
+        
+        for model in models_to_try:
+            try:
+                response = await self.client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=200,
+                    temperature=0.7,
+                    timeout=15.0
+                )
+                result = response.choices[0].message.content
+                if result and result.strip():
+                    return result
+            except Exception as e:
+                print(f"Model {model} failed: {e}")
+                continue
+        
+        return "Извините, сейчас не могу ответить. Попробуйте позже."
     
     async def parse_intent(self, message: str) -> dict:
         prompt = f"""Определи намерение. Ответь ТОЛЬКО JSON.
