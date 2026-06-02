@@ -4,7 +4,7 @@ from typing import List, Dict
 
 class Memory:
     def __init__(self, redis_url: str):
-        self.redis = redis.from_url(redis_url, decode_responses=True, protocol=2)
+        self.redis = redis.from_url(redis_url, decode_responses=True)
         self.history_limit = 20
     
     def add_message(self, user_id: int, role: str, content: str):
